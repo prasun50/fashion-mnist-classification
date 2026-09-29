@@ -1,0 +1,20 @@
+# Jupyter Notebook autosaves
+.ipynb_checkpoints/
+
+# Python bytecode & caching
+__pycache__/
+*.pyc
+
+# Virtual environments (if applicable)
+venv/
+.venv/
+env/
+
+# virtual documents
+.virtual_documents/
+
+# vscode settings
+.vscode/
+
+# ignore the data files as it will get automatically downloaded
+data/
