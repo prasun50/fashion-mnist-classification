@@ -35,7 +35,6 @@ Here are the images:
 ## Project Structure
 
 ```text
-|-- data/                 # Dataset storage
 |-- models/               # Neural network architecture definitions
 |-- notebooks/            # Exploratory analysis & experiments
 |-- src/
