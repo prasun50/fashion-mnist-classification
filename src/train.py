@@ -1,50 +1,26 @@
 import matplotlib.pyplot as plt
+from pathlib import Path
+import sys
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import FashionMNISTData
+import utils
 
-# just a linear layer
-class LinearModel(nn.Module):
+# path to models directory to import from models/
+path_to_models = Path(__file__).parent.parent / "models"
+if str(path_to_models) not in sys.path:
+    sys.path.append(str(path_to_models))
 
-    def __init__(self, num_inputs, num_outputs):
-        super().__init__()
-        self.num_inputs = num_inputs
-        self.num_outputs = num_outputs
-        self.net = nn.Linear(self.num_inputs, self.num_outputs)
+# import modules located inside models/
+import linear
 
-    def forward(self, x):
-        return self.net(x.reshape(x.shape[0], -1))
+class Trainer:
 
-    def loss(self, y_hat, y):
-        return F.cross_entropy(y_hat, y)
-
-    def configure_optimizer(self, lr):
-        return torch.optim.SGD(
-            self.parameters(),
-            lr=lr
-        )
-
-    def step(self, batch):
-        return self.loss(self(batch[0]), batch[1])
-
-    def training_step(self, batch):
-        return self.step(batch)
-
-    def validation_step(self, batch):
-        return self.step(batch)
-
-    def test_step(self, batch):
-        return self.step(batch)
-
-class Traniner:
-
-    def __init__(self, max_epoches=1, lr=1e-3):
+    def __init__(self, batch_size=32, max_epoches=1, lr=1e-3):
+        self.batch_size = batch_size
         self.max_epoches = max_epoches
         self.lr = lr
 
     def fit(self, model, data):
-        print("fitting model...")
+        print(f"fitting {model.__class__.__name__}...")
         self.configure_model(model)
         self.configure_data(data)
         self.epoch = 0
@@ -72,12 +48,15 @@ class Traniner:
 
     def configure_data(self, data):
         self.data = data
-        self.train_dataloader = data.train_dataloader
-        self.val_dataloader = data.val_dataloader
-        self.test_dataloader = data.test_dataloader
+        self.train_dataset, self.val_dataset = utils.split_dataset(
+            dataset = self.data.full_train_dataset,
+            lengths = [len(self.data.full_train_dataset)-len(self.data.test_dataset), len(self.data.test_dataset)]
+        )
+        self.test_dataset = self.data.test_dataset
+        self.train_dataloader = utils.get_dataloader(self.train_dataset, batch_size=self.batch_size)
 
     def calculate_accuracy(self):
-        loader = self.data.create_dataloader(self.data.val_dataset, batch_size=len(self.data.val_dataset))
+        loader = utils.get_dataloader(self.val_dataset, batch_size=len(self.val_dataset))
         x, y = next(iter(loader))
         self.model.eval()
         with torch.inference_mode():
@@ -90,16 +69,17 @@ class Traniner:
         return accuracy * 100
 
     def calculate_val_loss(self):
-        loader = self.data.create_dataloader(self.data.val_dataset, batch_size=len(self.data.val_dataset))
+        loader = utils.get_dataloader(self.val_dataset, batch_size=len(self.val_dataset))
         batch = next(iter(loader))
         self.model.eval()
         with torch.no_grad():
-            loss = self.model.training_step(batch).item()
+            loss = self.model.validation_step(batch).item()
         self.model.train()
         return loss
 
     def visualize_wrong_predictions(self):
-        x, y = next(iter(self.val_dataloader))
+        loader = utils.get_dataloader(self.val_dataset)
+        x, y = next(iter(loader))
         self.model.eval()
         with torch.inference_mode():
             logits = self.model(x)
@@ -123,9 +103,23 @@ class Traniner:
         fig.suptitle("Actual Class and Predicted Class", fontsize=14, fontweight="bold")
         plt.show()
 
+    def plot_training_loss(self):
+        losses = self.training_losses.reshape(-1)
+        losses = losses[: losses.shape[0] - losses.shape[0] % 100]
+        losses = losses.reshape(-1, 100).mean(dim=1)
+
+        fig, ax = plt.subplots(layout="constrained")
+        ax.plot(losses.numpy())
+        ax.set_xlabel("batch number")
+        ax.set_ylabel("loss")
+        ax.set_title("Training Loss", fontsize=14, fontweight="bold")
+        plt.show()
+
 if __name__ == "__main__":
-    data = FashionMNISTData.FashionMNISTData()
-    model = LinearModel(28*28, len(data.class_to_idx))
-    trainer = Traniner(3, lr=0.1)
+    data = utils.FashionMNISTData()
+    model = linear.LinearModel()
+    trainer = Trainer(max_epoches=3, lr=0.1)
     trainer.fit(model, data)
+    print("fitted the model")
+    trainer.plot_training_loss()
     trainer.visualize_wrong_predictions()
