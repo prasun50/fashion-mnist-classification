@@ -20,7 +20,7 @@ grayscale images of ten different classes each of size (28 X 28).
 
 Here are the images:
 
-![image of cloths](image.png)
+![image of cloths](class_image.png)
 
 ---
 
@@ -41,5 +41,7 @@ Here are the images:
 |   |-- train.py          # Training pipeline
 |   |-- utils.py          # Data loaders and helper functions
 |
-|-- README.md
+|-- .gitignore            
+|-- README.md             
+|-- class_image.png       # image of all the classes
 ```
