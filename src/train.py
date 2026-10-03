@@ -1,3 +1,4 @@
+import argparse
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
@@ -116,10 +117,18 @@ class Trainer:
         plt.show()
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="train model on FashionMNIST data")
+    parser.add_argument("--max-epoches", type=int, default=1, help="number of epoches")
+    parser.add_argument("--batch-size", type=int, default=32, help="batch size")
+    parser.add_argument("-l", "--learning-rate", type=float, default=1e-1, help="learning rate")
+    parser.add_argument("--model", default="LinearModel", choices=["LinearModel"], help="model to train the data on")
+    parser.add_argument("-v", "--visualize-wrong-preds", action="store_true", help="visualize wrong predictions")
+    args = parser.parse_args()
+    
     data = utils.FashionMNISTData()
-    model = linear.LinearModel()
-    trainer = Trainer(max_epoches=3, lr=0.1)
+    model = getattr(linear, args.model)()
+    trainer = Trainer(batch_size=args.batch_size, max_epoches=args.max_epoches, lr=args.learning_rate)
     trainer.fit(model, data)
-    print("fitted the model")
-    trainer.plot_training_loss()
-    trainer.visualize_wrong_predictions()
+
+    if args.visualize_wrong_preds:
+        trainer.visualize_wrong_predictions()
