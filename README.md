@@ -62,7 +62,7 @@ python src/train.py --model LinearModel -lr 0.05 --max-epoches 5
 To display misclassified images during training or evaluation, pass the `-v` / `--visualize-wrong-preds` flag:
 
 ```shell
-python src/trian.py --model=LinearModel -lr=0.1 --max-epoches=3 -v
+python src/train.py --model=LinearModel -lr=0.1 --max-epoches=3 -v
 ```
 
 ---
