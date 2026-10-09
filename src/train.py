@@ -120,7 +120,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="train model on FashionMNIST data")
     parser.add_argument("--max-epoches", type=int, default=1, help="number of epoches")
     parser.add_argument("--batch-size", type=int, default=32, help="batch size")
-    parser.add_argument("-l", "--learning-rate", type=float, default=1e-1, help="learning rate")
+    parser.add_argument("-lr", "--learning-rate", type=float, default=1e-1, help="learning rate")
     parser.add_argument("--model", default="LinearModel", choices=["LinearModel", "LeNet"], help="model to train the data on")
     parser.add_argument("-v", "--visualize-wrong-preds", action="store_true", help="visualize wrong predictions")
     args = parser.parse_args()
