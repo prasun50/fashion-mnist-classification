@@ -11,7 +11,7 @@ if str(path_to_models) not in sys.path:
     sys.path.append(str(path_to_models))
 
 # import modules located inside models/
-import linear
+import models
 
 class Trainer:
 
@@ -121,12 +121,12 @@ if __name__ == "__main__":
     parser.add_argument("--max-epoches", type=int, default=1, help="number of epoches")
     parser.add_argument("--batch-size", type=int, default=32, help="batch size")
     parser.add_argument("-l", "--learning-rate", type=float, default=1e-1, help="learning rate")
-    parser.add_argument("--model", default="LinearModel", choices=["LinearModel"], help="model to train the data on")
+    parser.add_argument("--model", default="LinearModel", choices=["LinearModel", "LeNet"], help="model to train the data on")
     parser.add_argument("-v", "--visualize-wrong-preds", action="store_true", help="visualize wrong predictions")
     args = parser.parse_args()
     
     data = utils.FashionMNISTData()
-    model = getattr(linear, args.model)()
+    model = getattr(models, args.model)()
     trainer = Trainer(batch_size=args.batch_size, max_epoches=args.max_epoches, lr=args.learning_rate)
     trainer.fit(model, data)
 

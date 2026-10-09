@@ -72,6 +72,7 @@ python src/trian.py --model=LinearModel -lr=0.1 --max-epoches=3 -v
 | Model Architecture | Parameters | Validation Loss | Validation Accuracy |
 | :--- | :--- | :--- | :--- |
 | Baseline (Linear) | ~7.9K | 0.4961 | 83.42% |
+| LeNet | ~6.2k | 0.35 | 87.16 |
 
 ---
 
